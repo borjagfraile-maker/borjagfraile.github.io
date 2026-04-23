@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Precios - Ecommerce</title>
+    <style>
+        :root {
+            --bg: #0b0e13;
+            --surface: #131722;
+            --surface-alt: #1c2030;
+            --text: #e9ecf2;
+            --text-secondary: #aeb6c7;
+            --text-muted: #6c718a;
+            --accent: #5b7bfa;
+            --accent-dark: #4466e0;
+            --accent-light: #1e2640;
+            --border: #262b3a;
+            --border-light: #1f2433;
+            --success: #2edb9b;
+            --warning: #f0b949;
+            --danger: #f55c5c;
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.45);
+            --shadow: 0 6px 18px rgba(0,0,0,0.5);
+            --shadow-lg: 0 14px 36px rgba(0,0,0,0.55);
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header */
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text);
+            letter-spacing: -0.3px;
+        }
+        .header-brand .icon {
+            width: 38px;
+            height: 38px;
+            background: var(--accent);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+        .header-badge {
+            background: var(--accent-light);
+            color: #a0b8ff;
+            padding: 6px 14px;
+            border-radius: 24px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+
+        /* Layout */
+        .main-container {
+            max-width: 1340px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.75rem;
+        }
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+            transition: var(--transition);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.25rem;
+        }
+        .card-header .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .card-icon.blue {
+            background: #1e2b4f;
+            color: #7b93fc;
+        }
+        .card-icon.green {
+            background: #163c33;
+            color: #2edb9b;
+        }
+        .card-icon.amber {
+            background: #3d3522;
+            color: #f0b949;
+        }
+        .card-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            letter-spacing: -0.2px;
+            color: var(--text);
+        }
+        .card-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 1.15rem;
+        }
+        .form-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            letter-spacing: -0.1px;
+        }
+        .form-label .unit {
+            font-weight: 400;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        input[type="number"],
+        input[type="text"] {
+            flex: 1;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font);
+            font-size: 0.92rem;
+            background: var(--surface-alt);
+            color: var(--text);
+            transition: var(--transition);
+            outline: none;
+            min-width: 0;
+        }
+        input[type="number"]:focus,
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(91, 123, 250, 0.12);
+            background: #1a1f32;
+        }
+        input[type="range"] {
+            flex: 1;
+            accent-color: var(--accent);
+            height: 6px;
+            cursor: pointer;
+            background: transparent;
+        }
+        .range-value {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--accent);
+            min-width: 42px;
+            text-align: right;
+            font-family: var(--mono);
+        }
+        .form-hint {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        /* Section divider */
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--border-light);
+            margin: 1.25rem 0;
+        }
+
+        /* Escandallo Table */
+        .escandallo-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+        .escandallo-table th,
+        .escandallo-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text);
+        }
+        .escandallo-table th {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            background: var(--surface-alt);
+            border-radius: 6px 6px 0 0;
+        }
+        .escandallo-table td:last-child,
+        .escandallo-table th:last-child {
+            text-align: right;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+        }
+        .escandallo-table .positive {
+            color: var(--success);
+            font-weight: 700;
+        }
+        .escandallo-table .negative {
+            color: var(--danger);
+        }
+        .escandallo-table .highlight-row {
+            background: #1e2640;
+            font-weight: 700;
+            border-radius: 6px;
+        }
+        .escandallo-table .highlight-row td {
+            border-bottom: 2px solid var(--accent);
+            color: #c4d0ff;
+        }
+        .escandallo-table .total-row td {
+            font-weight: 700;
+            font-size: 0.95rem;
+            border-top: 2px solid var(--border);
+            padding-top: 12px;
+        }
+
+        /* Result badge */
+        .result-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .result-badge.good {
+            background: #163c33;
+            color: #2edb9b;
+        }
+        .result-badge.warn {
+            background: #3d3522;
+            color: #f0b949;
+        }
+        .result-badge.danger {
+            background: #3b1f1f;
+            color: #f55c5c;
+        }
+
+        /* PVP highlight */
+        .pvp-highlight {
+            background: linear-gradient(135deg, #2f3d7a 0%, #4f6ef7 100%);
+            color: #fff;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem 1.75rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .pvp-highlight .pvp-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.85;
+            margin-bottom: 4px;
+        }
+        .pvp-highlight .pvp-value {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            font-family: var(--mono);
+        }
+        .pvp-highlight .pvp-sub {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--surface-alt);
+            border-radius: var(--radius);
+            padding: 4px;
+            margin-bottom: 1.25rem;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 9px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-family: var(--font);
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .tab-btn.active {
+            background: var(--surface);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Info section */
+        .info-block {
+            margin-bottom: 1rem;
+        }
+        .info-block h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            letter-spacing: -0.2px;
+        }
+        .info-block p,
+        .info-block li {
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+        .info-block ul {
+            padding-left: 1.2rem;
+        }
+        .info-block ul li {
+            margin-bottom: 0.3rem;
+        }
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.72rem;
+            margin-right: 6px;
+            flex-shrink: 0;
+        }
+
+        /* Footer */
+        .footer-note {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            padding: 1.5rem;
+            grid-column: 1 / -1;
+        }
+
+        .tooltip-trigger {
+            border-bottom: 1px dotted var(--text-muted);
+            cursor: help;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-brand">
+            <div class="icon">€</div>
+            <span>ScapaFlowLab</span>
+        </div>
+        <span class="header-badge">Calculadora de Precios · Ecommerce</span>
+    </header>
+
+    <!-- MAIN GRID -->
+    <div class="main-container">
+
+        <!-- ==================== COLUMNA IZQUIERDA: DATOS DE ENTRADA ==================== -->
+        <div>
+            <!-- Tarjeta: Datos básicos -->
+            <div class="card" style="margin-bottom:1.75rem;">
+                <div class="card-header">
+                    <div class="card-icon blue">📦</div>
+                    <div>
+                        <div class="card-title">Datos de Partida</div>
+                        <div class="card-subtitle">Costes con IVA incluido</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Coste del producto <span class="unit">IVA inc.</span></label>
+                    <div class="input-row">
+                        <input type="number" id="costeProducto" value="8.46" step="0.01" min="0">
+                        <span style="color:var(--text-muted);font-weight:600;">€</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Gastos de envío (coste empresa) <span class="unit">IVA inc.</span></label>
+                    <div class="input-row">
+                        <input type="number" id="costeEnvio" value="4.29" step="0.01" min="0">
+                        <span style="color:var(--text-muted);font-weight:600;">€</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tipo de IVA <span class="unit">%</span></label>
+                    <div class="input-row">
+                        <input type="range" id="ivaPorcentaje" value="21" min="0" max="27" step="1">
+                        <span class="range-value" id="ivaPorcentajeVal">21%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta: Margen -->
+            <div class="card" style="margin-bottom:1.75rem;">
+                <div class="card-header">
+                    <div class="card-icon amber">🎯</div>
+                    <div>
+                        <div class="card-title">Margen Objetivo</div>
+                        <div class="card-subtitle">Define tu rentabilidad</div>
+                    </div>
+                </div>
+                <div class="tabs" id="tipoMargenTabs">
+                    <button class="tab-btn active" data-tab="margen-sobre-venta">Margen s/venta (%)</button>
+                    <button class="tab-btn" data-tab="markup">Markup s/coste (%)</button>
+                </div>
+                <div id="panel-margen-sobre-venta">
+                    <div class="form-group">
+                        <label class="form-label">Margen bruto sobre venta</label>
+                        <div class="input-row">
+                            <input type="range" id="margenSobreVenta" value="35" min="5" max="80" step="0.5">
+                            <span class="range-value" id="margenSobreVentaVal">35%</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="panel-markup" style="display:none;">
+                    <div class="form-group">
+                        <label class="form-label">Markup sobre coste</label>
+                        <div class="input-row">
+                            <input type="range" id="markupSobreCoste" value="54" min="5" max="400" step="0.5">
+                            <span class="range-value" id="markupSobreCosteVal">54%</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="form-hint" id="margenEquivalente"></p>
+            </div>
+
+            <!-- Tarjeta: Gastos adicionales -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">📊</div>
+                    <div>
+                        <div class="card-title">Gastos Adicionales</div>
+                        <div class="card-subtitle">Comisiones, marketing, logística...</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Comisión marketplace <span class="unit">% s/PVP neto</span></label>
+                    <div class="input-row">
+                        <input type="range" id="comisionMarketplace" value="0" min="0" max="25" step="0.5">
+                        <span class="range-value" id="comisionMarketplaceVal">0%</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Pasarela de pago <span class="unit">% s/PVP neto + fijo</span></label>
+                    <div class="input-row" style="gap:6px;">
+                        <input type="number" id="pasarelaPorcentaje" value="2.5" step="0.1" min="0" style="flex:1;">
+                        <span style="font-size:0.78rem;color:var(--text-muted);">% +</span>
+                        <input type="number" id="pasarelaFijo" value="0.35" step="0.01" min="0" style="flex:1;">
+                        <span style="font-size:0.78rem;color:var(--text-muted);">€</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Embalaje y manipulación <span class="unit">€/unidad</span></label>
+                    <div class="input-row">
+                        <input type="number" id="embalaje" value="0.55" step="0.01" min="0">
+                        <span style="color:var(--text-muted);font-weight:600;">€</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Provisión devoluciones <span class="unit">% s/PVP neto</span></label>
+                    <div class="input-row">
+                        <input type="range" id="devoluciones" value="2" min="0" max="15" step="0.5">
+                        <span class="range-value" id="devolucionesVal">2%</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Marketing (CAC estimado) <span class="unit">€/venta</span></label>
+                    <div class="input-row">
+                        <input type="number" id="marketing" value="1.50" step="0.01" min="0">
+                        <span style="color:var(--text-muted);font-weight:600;">€</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Gastos generales prorrateados <span class="unit">€/unidad</span></label>
+                    <div class="input-row">
+                        <input type="number" id="gastosGenerales" value="0.60" step="0.01" min="0">
+                        <span style="color:var(--text-muted);font-weight:600;">€</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== COLUMNA DERECHA: RESULTADOS + INFO ==================== -->
+        <div>
+            <!-- PVP destacado -->
+            <div class="pvp-highlight" id="pvpHighlight">
+                <div class="pvp-label">PVP Recomendado (IVA y envío incluidos)</div>
+                <div class="pvp-value" id="pvpFinal">19,99 €</div>
+                <div class="pvp-sub" id="pvpSub">Margen bruto: 36.2% · Envío gratis para el cliente</div>
+            </div>
+
+            <!-- Escandallo -->
+            <div class="card" style="margin-bottom:1.75rem;">
+                <div class="card-header">
+                    <div class="card-icon green">📋</div>
+                    <div>
+                        <div class="card-title">Escandallo Completo</div>
+                        <div class="card-subtitle">Actualizado en tiempo real</div>
+                    </div>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="escandallo-table" id="escandalloTable">
+                        <thead>
+                            <tr>
+                                <th>Concepto</th>
+                                <th>Importe (€)</th>
+                                <th>% s/PVP neto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="escandalloBody">
+                            <!-- Se genera dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top:0.75rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <span style="font-weight:600;font-size:0.85rem;">Rentabilidad neta:</span>
+                    <span class="result-badge good" id="rentabilidadBadge">✅ Saludable (13.6%)</span>
+                </div>
+            </div>
+
+            <!-- Documento informativo -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon blue">📖</div>
+                    <div>
+                        <div class="card-title">Guía de Formación de Precios</div>
+                        <div class="card-subtitle">Metodología profesional paso a paso</div>
+                    </div>
+                </div>
+                <div class="info-block">
+                    <h3><span class="step-number">1</span> Coste neto unitario</h3>
+                    <p>Extrae el IVA soportado (deducible) del producto y del envío. El coste real es <strong>sin IVA</strong>. Si el IVA es del <span id="infoIva">21</span>%, el coste neto del producto es <span id="infoCosteNeto">6,99 €</span> y el del envío <span id="infoEnvioNeto">3,55 €</span>.</p>
+                </div>
+                <div class="info-block">
+                    <h3><span class="step-number">2</span> Margen bruto objetivo</h3>
+                    <p>En ecommerce se recomienda un margen bruto sobre venta del <strong>35%–50%</strong>. Esto equivale a un markup sobre coste del 54%–100%. A mayor margen, más colchón para absorber gastos indirectos.</p>
+                </div>
+                <div class="info-block">
+                    <h3><span class="step-number">3</span> PVP con IVA incluido</h3>
+                    <p>Al PVP neto se le suma el IVA repercutido. El resultado se redondea a un precio psicológico atractivo (ej. 19,99 € en lugar de 20,00 €).</p>
+                </div>
+                <div class="info-block">
+                    <h3><span class="step-number">4</span> Desglose de gastos adicionales</h3>
+                    <ul>
+                        <li><strong>Marketplace:</strong> 0%–15% sobre PVP neto</li>
+                        <li><strong>Pasarela de pago:</strong> ~2,5% + 0,35 € por transacción</li>
+                        <li><strong>Embalaje:</strong> 0,40 €–1,50 € por envío</li>
+                        <li><strong>Devoluciones:</strong> 2%–5% de previsión</li>
+                        <li><strong>Marketing (CAC):</strong> coste por venta vía anuncios</li>
+                        <li><strong>Gastos generales:</strong> estructura, sueldos, asesoría...</li>
+                    </ul>
+                </div>
+                <div class="info-block">
+                    <h3><span class="step-number">5</span> Validación de mercado</h3>
+                    <p>Compara con la competencia y ajusta según valor percibido, ciclo de vida del producto y posicionamiento de marca. Un precio sin respaldo del mercado no generará ventas aunque el margen sea atractivo.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            💡 Todos los cálculos se actualizan en tiempo real. Modifica cualquier valor arriba y observa cómo cambia el escandallo. · ScapaFlowLab © 2026
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // --- Elementos DOM ---
+            const costeProductoInput = document.getElementById('costeProducto');
+            const costeEnvioInput = document.getElementById('costeEnvio');
+            const ivaPorcentajeInput = document.getElementById('ivaPorcentaje');
+            const ivaPorcentajeVal = document.getElementById('ivaPorcentajeVal');
+            const margenSobreVentaInput = document.getElementById('margenSobreVenta');
+            const margenSobreVentaVal = document.getElementById('margenSobreVentaVal');
+            const markupSobreCosteInput = document.getElementById('markupSobreCoste');
+            const markupSobreCosteVal = document.getElementById('markupSobreCosteVal');
+            const comisionMarketplaceInput = document.getElementById('comisionMarketplace');
+            const comisionMarketplaceVal = document.getElementById('comisionMarketplaceVal');
+            const pasarelaPorcentajeInput = document.getElementById('pasarelaPorcentaje');
+            const pasarelaFijoInput = document.getElementById('pasarelaFijo');
+            const embalajeInput = document.getElementById('embalaje');
+            const devolucionesInput = document.getElementById('devoluciones');
+            const devolucionesVal = document.getElementById('devolucionesVal');
+            const marketingInput = document.getElementById('marketing');
+            const gastosGeneralesInput = document.getElementById('gastosGenerales');
+            const pvpFinalEl = document.getElementById('pvpFinal');
+            const pvpSubEl = document.getElementById('pvpSub');
+            const escandalloBody = document.getElementById('escandalloBody');
+            const rentabilidadBadge = document.getElementById('rentabilidadBadge');
+            const margenEquivalenteEl = document.getElementById('margenEquivalente');
+            const infoIvaEl = document.getElementById('infoIva');
+            const infoCosteNetoEl = document.getElementById('infoCosteNeto');
+            const infoEnvioNetoEl = document.getElementById('infoEnvioNeto');
+
+            // Tabs
+            const tabBtns = document.querySelectorAll('#tipoMargenTabs .tab-btn');
+            const panelMargenVenta = document.getElementById('panel-margen-sobre-venta');
+            const panelMarkup = document.getElementById('panel-markup');
+            let modoMargen = 'venta'; // 'venta' o 'markup'
+
+            // --- Funciones de cálculo ---
+            function redondear(num, decimales = 2) {
+                return Math.round(num * Math.pow(10, decimales)) / Math.pow(10, decimales);
+            }
+
+            function formatearEuro(num) {
+                return num.toFixed(2).replace('.', ',') + ' €';
+            }
+
+            function formatearPorcentaje(num) {
+                return num.toFixed(1).replace('.', ',') + '%';
+            }
+
+            function calcularTodo() {
+                // Leer valores base
+                const costeProdIVA = parseFloat(costeProductoInput.value) || 0;
+                const costeEnvioIVA = parseFloat(costeEnvioInput.value) || 0;
+                const ivaPct = parseFloat(ivaPorcentajeInput.value) || 21;
+
+                // Costes netos
+                const factorIVA = 1 + ivaPct / 100;
+                const costeProdNeto = costeProdIVA / factorIVA;
+                const costeEnvioNeto = costeEnvioIVA / factorIVA;
+                const costeTotalNeto = costeProdNeto + costeEnvioNeto;
+
+                // Leer margen según modo
+                let pvpNeto;
+                let margenBrutoSobreVenta;
+                let markupSobreCoste;
+
+                if (modoMargen === 'venta') {
+                    const mgVentaPct = parseFloat(margenSobreVentaInput.value) || 35;
+                    if (mgVentaPct >= 100) {
+                        pvpNeto = costeTotalNeto / 0.01;
+                        margenBrutoSobreVenta = 99;
+                    } else {
+                        pvpNeto = costeTotalNeto / (1 - mgVentaPct / 100);
+                        margenBrutoSobreVenta = mgVentaPct;
+                    }
+                    markupSobreCoste = ((pvpNeto - costeTotalNeto) / costeTotalNeto) * 100;
+                    if (costeTotalNeto === 0) markupSobreCoste = 0;
+                } else {
+                    const markupPct = parseFloat(markupSobreCosteInput.value) || 54;
+                    pvpNeto = costeTotalNeto * (1 + markupPct / 100);
+                    markupSobreCoste = markupPct;
+                    if (pvpNeto > 0) {
+                        margenBrutoSobreVenta = ((pvpNeto - costeTotalNeto) / pvpNeto) * 100;
+                    } else {
+                        margenBrutoSobreVenta = 0;
+                    }
+                }
+
+                // PVP con IVA (antes de redondeo psicológico)
+                const pvpConIVAExacto = pvpNeto * factorIVA;
+
+                // Aplicar redondeo psicológico: terminar en ,99 si es >= 5€
+                let pvpFinalMostrar;
+                let pvpNetoReal;
+                if (pvpConIVAExacto >= 5) {
+                    const entero = Math.floor(pvpConIVAExacto);
+                    const candidato99 = entero + 0.99;
+                    if (pvpConIVAExacto <= candidato99 && candidato99 - pvpConIVAExacto < 0.80) {
+                        pvpFinalMostrar = candidato99;
+                    } else if (pvpConIVAExacto > candidato99) {
+                        pvpFinalMostrar = entero + 1.99;
+                    } else {
+                        if (entero >= 1) {
+                            pvpFinalMostrar = (entero - 1) + 0.99;
+                            if (pvpFinalMostrar < pvpConIVAExacto - 1.5) pvpFinalMostrar = candidato99;
+                        } else {
+                            pvpFinalMostrar = candidato99;
+                        }
+                    }
+                    if (pvpFinalMostrar < pvpConIVAExacto - 2) pvpFinalMostrar = Math.ceil(pvpConIVAExacto) - 0.01;
+                } else {
+                    pvpFinalMostrar = redondear(pvpConIVAExacto, 2);
+                }
+                pvpNetoReal = pvpFinalMostrar / factorIVA;
+                const margenBrutoReal = pvpNetoReal > 0 ? ((pvpNetoReal - costeTotalNeto) / pvpNetoReal) * 100 : 0;
+
+                // Gastos adicionales
+                const comisionMktPct = parseFloat(comisionMarketplaceInput.value) || 0;
+                const comisionMkt = pvpNetoReal * (comisionMktPct / 100);
+
+                const pasarelaPct = parseFloat(pasarelaPorcentajeInput.value) || 0;
+                const pasarelaFijo = parseFloat(pasarelaFijoInput.value) || 0;
+                const costePasarela = pvpNetoReal * (pasarelaPct / 100) + pasarelaFijo;
+
+                const costeEmbalaje = parseFloat(embalajeInput.value) || 0;
+                const devolucionesPct = parseFloat(devolucionesInput.value) || 0;
+                const costeDevoluciones = pvpNetoReal * (devolucionesPct / 100);
+                const costeMarketing = parseFloat(marketingInput.value) || 0;
+                const costeGenerales = parseFloat(gastosGeneralesInput.value) || 0;
+
+                const totalGastosAdicionales = comisionMkt + costePasarela + costeEmbalaje + costeDevoluciones + costeMarketing + costeGenerales;
+                const beneficioNeto = pvpNetoReal - costeTotalNeto - totalGastosAdicionales;
+                const rentabilidadNetaPct = pvpNetoReal > 0 ? (beneficioNeto / pvpNetoReal) * 100 : 0;
+
+                // --- Actualizar UI ---
+                pvpFinalEl.textContent = formatearEuro(pvpFinalMostrar);
+                pvpSubEl.textContent = `Margen bruto: ${formatearPorcentaje(margenBrutoReal)} · Envío gratis · Coste total neto: ${formatearEuro(costeTotalNeto)}`;
+
+                infoIvaEl.textContent = Math.round(ivaPct);
+                infoCosteNetoEl.textContent = formatearEuro(costeProdNeto);
+                infoEnvioNetoEl.textContent = formatearEuro(costeEnvioNeto);
+
+                if (modoMargen === 'venta') {
+                    margenEquivalenteEl.textContent = `Markup equivalente sobre coste: ${formatearPorcentaje(markupSobreCoste)}`;
+                } else {
+                    margenEquivalenteEl.textContent = `Margen bruto equivalente sobre venta: ${formatearPorcentaje(margenBrutoSobreVenta)}`;
+                }
+
+                // Escandallo
+                const filas = [
+                    { concepto: 'PVP final (IVA inc.)', importe: pvpFinalMostrar, pct: null, clase: 'total-row', prefijo: '' },
+                    { concepto: 'IVA repercutido (' + Math.round(ivaPct) + '%)', importe: -(pvpFinalMostrar - pvpNetoReal), pct: null, clase: '', prefijo: '' },
+                    { concepto: 'PVP neto', importe: pvpNetoReal, pct: 100, clase: 'highlight-row', prefijo: '' },
+                    { concepto: 'Coste producto (neto)', importe: -costeProdNeto, pct: costeProdNeto / pvpNetoReal * 100, clase: '', prefijo: '' },
+                    { concepto: 'Coste envío (neto)', importe: -costeEnvioNeto, pct: costeEnvioNeto / pvpNetoReal * 100, clase: '', prefijo: '' },
+                    { concepto: 'Margen bruto inicial', importe: pvpNetoReal - costeTotalNeto, pct: margenBrutoReal, clase: 'positive', prefijo: '' },
+                    { concepto: 'Comisión marketplace (' + formatearPorcentaje(comisionMktPct) + ')', importe: -comisionMkt, pct: comisionMktPct, clase: 'negative', prefijo: '' },
+                    { concepto: 'Pasarela de pago', importe: -costePasarela, pct: (costePasarela / pvpNetoReal) * 100, clase: 'negative', prefijo: '' },
+                    { concepto: 'Embalaje', importe: -costeEmbalaje, pct: (costeEmbalaje / pvpNetoReal) * 100, clase: 'negative', prefijo: '' },
+                    { concepto: 'Devoluciones (provisión)', importe: -costeDevoluciones, pct: devolucionesPct, clase: 'negative', prefijo: '' },
+                    { concepto: 'Marketing (CAC)', importe: -costeMarketing, pct: (costeMarketing / pvpNetoReal) * 100, clase: 'negative', prefijo: '' },
+                    { concepto: 'Gastos generales', importe: -costeGenerales, pct: (costeGenerales / pvpNetoReal) * 100, clase: 'negative', prefijo: '' },
+                    { concepto: 'Beneficio neto antes de impuestos', importe: beneficioNeto, pct: rentabilidadNetaPct, clase: beneficioNeto >= 0 ? 'positive total-row' : 'negative total-row', prefijo: '' },
+                ];
+
+                escandalloBody.innerHTML = filas.map(f => {
+                    const importeStr = formatearEuro(Math.abs(f.importe));
+                    const signo = f.importe < 0 ? '− ' : f.importe > 0 ? '+ ' : '';
+                    const pctStr = f.pct !== null ? formatearPorcentaje(Math.abs(f.pct)) : '—';
+                    const claseFila = f.clase || '';
+                    return `
+                            <tr class="${claseFila}">
+                                <td>${f.concepto}</td>
+                                <td style="color:${f.importe < 0 ? 'var(--danger)' : f.importe > 0 && f.concepto.includes('Beneficio') ? 'var(--success)' : 'inherit'};${f.clase.includes('total-row') ? 'font-weight:700;' : ''}">${signo}${importeStr}</td>
+                                <td>${pctStr}</td>
+                            </tr>
+                        `;
+                }).join('');
+
+                if (beneficioNeto >= 2 && rentabilidadNetaPct >= 10) {
+                    rentabilidadBadge.textContent = `✅ Saludable (${formatearPorcentaje(rentabilidadNetaPct)})`;
+                    rentabilidadBadge.className = 'result-badge good';
+                } else if (beneficioNeto >= 0.5 && rentabilidadNetaPct >= 3) {
+                    rentabilidadBadge.textContent = `⚠️ Ajustada (${formatearPorcentaje(rentabilidadNetaPct)})`;
+                    rentabilidadBadge.className = 'result-badge warn';
+                } else if (beneficioNeto >= 0) {
+                    rentabilidadBadge.textContent = `🔴 Mínima (${formatearPorcentaje(rentabilidadNetaPct)})`;
+                    rentabilidadBadge.className = 'result-badge warn';
+                } else {
+                    rentabilidadBadge.textContent = `🚨 Pérdidas (${formatearPorcentaje(rentabilidadNetaPct)})`;
+                    rentabilidadBadge.className = 'result-badge danger';
+                }
+
+                if (modoMargen === 'venta') {
+                    markupSobreCosteInput.value = redondear(markupSobreCoste, 1);
+                    markupSobreCosteVal.textContent = formatearPorcentaje(markupSobreCoste);
+                } else {
+                    margenSobreVentaInput.value = redondear(margenBrutoSobreVenta, 1);
+                    margenSobreVentaVal.textContent = formatearPorcentaje(margenBrutoSobreVenta);
+                }
+            }
+
+            // --- Event listeners ---
+            function addListeners() {
+                const inputs = [
+                    costeProductoInput, costeEnvioInput, ivaPorcentajeInput,
+                    margenSobreVentaInput, markupSobreCosteInput,
+                    comisionMarketplaceInput, pasarelaPorcentajeInput, pasarelaFijoInput,
+                    embalajeInput, devolucionesInput, marketingInput, gastosGeneralesInput
+                ];
+                inputs.forEach(inp => inp.addEventListener('input', calcularTodo));
+
+                ivaPorcentajeInput.addEventListener('input', () => {
+                    ivaPorcentajeVal.textContent = ivaPorcentajeInput.value + '%';
+                    calcularTodo();
+                });
+                margenSobreVentaInput.addEventListener('input', () => {
+                    margenSobreVentaVal.textContent = margenSobreVentaInput.value + '%';
+                    calcularTodo();
+                });
+                markupSobreCosteInput.addEventListener('input', () => {
+                    markupSobreCosteVal.textContent = markupSobreCosteInput.value + '%';
+                    calcularTodo();
+                });
+                comisionMarketplaceInput.addEventListener('input', () => {
+                    comisionMarketplaceVal.textContent = comisionMarketplaceInput.value + '%';
+                    calcularTodo();
+                });
+                devolucionesInput.addEventListener('input', () => {
+                    devolucionesVal.textContent = devolucionesInput.value + '%';
+                    calcularTodo();
+                });
+
+                tabBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        tabBtns.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        const tab = btn.dataset.tab;
+                        if (tab === 'margen-sobre-venta') {
+                            modoMargen = 'venta';
+                            panelMargenVenta.style.display = 'block';
+                            panelMarkup.style.display = 'none';
+                        } else {
+                            modoMargen = 'markup';
+                            panelMargenVenta.style.display = 'none';
+                            panelMarkup.style.display = 'block';
+                        }
+                        calcularTodo();
+                    });
+                });
+            }
+
+            function inicializar() {
+                ivaPorcentajeVal.textContent = ivaPorcentajeInput.value + '%';
+                margenSobreVentaVal.textContent = margenSobreVentaInput.value + '%';
+                markupSobreCosteVal.textContent = markupSobreCosteInput.value + '%';
+                comisionMarketplaceVal.textContent = comisionMarketplaceInput.value + '%';
+                devolucionesVal.textContent = devolucionesInput.value + '%';
+                calcularTodo();
+            }
+
+            addListeners();
+            inicializar();
+        })();
+    </script>
+</body>
+</html>
